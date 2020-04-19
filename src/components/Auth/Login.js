@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import useFormValidation from "./useFormValidation";
 import validateLogin from "./validateLogin";
+import firebase from "../../firebase";
+import { Link } from "react-router-dom";
 
 const INITIAL_STATE = {
   name: "",
@@ -17,7 +19,22 @@ function Login(props) {
     handleBlur,
     errors,
     isSubmitting,
-  } = useFormValidation(INITIAL_STATE, validateLogin);
+  } = useFormValidation(INITIAL_STATE, validateLogin, authenticateUser);
+  const [firebaseError, setFirebaseError] = useState(null);
+
+  async function authenticateUser() {
+    const { name, email, password } = values;
+    try {
+      login
+        ? await firebase.login(email, password)
+        : await firebase.register(name, email, password);
+      //redirect to homepage >>> props have route props
+      props.history.push("/");
+    } catch (err) {
+      console.error("Authenticated error", err);
+      setFirebaseError(err.message);
+    }
+  }
 
   return (
     <div>
@@ -55,7 +72,7 @@ function Login(props) {
           className={errors.password && "error-input"}
         />
         {errors.password && <p className="error-text">{errors.password}</p>}
-
+        {firebaseError && <p className="error-text">{firebaseError}</p>}
         <div className="flex mt3">
           <button
             type="submit"
@@ -74,6 +91,9 @@ function Login(props) {
           </button>
         </div>
       </form>
+      <div className="forgot-password">
+        <Link to="/forgot">Forgot Password?</Link>
+      </div>
     </div>
   );
 }
