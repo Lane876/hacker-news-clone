@@ -8,6 +8,10 @@ function SearchLinks() {
   const [filter, setFilter] = useState("");
   const [links, setLinks] = useState([]);
 
+  useEffect(() => {
+    getInitialLinks();
+  }, []);
+
   function handleSearch(event) {
     event.preventDefault();
     const query = filter.toLowerCase();
@@ -20,10 +24,6 @@ function SearchLinks() {
     });
     setFilteredLinks(matchedLinks);
   }
-
-  useEffect(() => {
-    getInitialLinks();
-  }, []);
 
   function getInitialLinks() {
     firebase.db
